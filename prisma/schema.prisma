@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String @id @default(uuid()) @db.Uuid
+  name         String @db.VarChar(255)
+  emailAddress String @unique @map("email_addres") @db.VarChar(255)
+  username     String @unique @db.VarChar(255)
+  password     String @db.Text
+
+  authToken String?   @map("auth_token") @db.Text
+  deleted   Boolean   @default(false) @db.Boolean
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  tweet Tweet[]
+
+  Like Like[]
+
+  Reply Reply[]
+
+  @@map("users")
+}
+
+model Tweet {
+  id      String    @id @default(uuid()) @db.Uuid
+  content String?   @db.VarChar(280)
+  type    TweetType @default(TWEET)
+  userId  String    @db.Uuid
+  user    User      @relation(fields: [userId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  Like Like[]
+
+  Reply Reply[]
+
+  @@map("tweets")
+}
+
+enum TweetType {
+  TWEET
+  REPLY
+}
+
+model Like {
+  id      String @id @default(uuid()) @db.Uuid
+  userId  String @db.Uuid
+  tweetId String @db.Uuid
+
+  user  User  @relation(fields: [userId], references: [id])
+  tweet Tweet @relation(fields: [tweetId], references: [id])
+
+  @@map("likes")
+}
+
+model Reply {
+  id      String @id @default(uuid()) @db.Uuid
+  userId  String @db.Uuid
+  tweetId String @db.Uuid
+
+  user  User  @relation(fields: [userId], references: [id])
+  tweet Tweet @relation(fields: [tweetId], references: [id])
+
+  @@map("replys")
+}
