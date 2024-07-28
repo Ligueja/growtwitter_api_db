@@ -60,7 +60,6 @@ Requisitos / Features:
 
 - Nodejs
 - TypeScript
-- React
 - BD (Postgres)
 - Primas (ORM)
 
